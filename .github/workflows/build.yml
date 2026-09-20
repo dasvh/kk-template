@@ -6,14 +6,15 @@ on:
 
 jobs:
   latex:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Install TeX dependencies
         run: |
           sudo apt-get update
           sudo apt-get install --no-install-recommends -y \
-            latexmk texlive-fonts-extra texlive-latex-extra texlive-xetex
+            latexmk texlive-fonts-extra texlive-fonts-recommended texlive-lang-german \
+            texlive-latex-extra texlive-xetex
       - name: Build profile
         run: |
           mkdir -p build

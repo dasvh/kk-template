@@ -12,6 +12,7 @@ dist/
 *.out
 *.toc
 *.xdv
+*.actrc
 
 # Task and editor/OS state.
 .task/

@@ -1,0 +1,23 @@
+# Private user content. These files are loaded when present but are never part
+# of the public template.
+local/
+
+# Generated documents and TeX build products.
+build/
+dist/
+*.aux
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.toc
+*.xdv
+
+# Task and editor/OS state.
+.task/
+.DS_Store
+.idea/
+.vscode/
+
+# Do not accidentally add generated PDFs to the source repository.
+*.pdf

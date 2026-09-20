@@ -1,0 +1,52 @@
+version: "3"
+
+vars:
+  OUTDIR: build
+  CARD_FILE: "{{.OUTDIR}}/kompetenzprofil.pdf"
+  PICKER_FILE: "{{.OUTDIR}}/kompetenzkatalog.pdf"
+
+tasks:
+  default:
+    desc: Build the profile and competency catalog picker
+    deps: [gen-cards, gen-picker]
+
+  clean:
+    desc: Remove generated documents and TeX build products
+    cmds:
+      - rm -rf "{{.OUTDIR}}"
+
+  gen-cards:
+    desc: Build the profile and landscape competency cards
+    sources:
+      - "**/*.tex"
+      - Taskfile.yml
+    generates:
+      - "{{.CARD_FILE}}"
+    cmds:
+      - mkdir -p "{{.OUTDIR}}"
+      - latexmk -pdfxe -jobname=kompetenzprofil -interaction=nonstopmode -halt-on-error -file-line-error -Werror -outdir="{{.OUTDIR}}" main.tex
+      - '! grep -Eq "undefined|There were undefined references|Reference .*undefined" "{{.OUTDIR}}/kompetenzprofil.log"'
+
+  gen-picker:
+    desc: Build the competency catalog picker
+    sources:
+      - "**/*.tex"
+      - Taskfile.yml
+    generates:
+      - "{{.PICKER_FILE}}"
+    cmds:
+      - mkdir -p "{{.OUTDIR}}"
+      - latexmk -pdfxe -jobname=kompetenzkatalog -interaction=nonstopmode -halt-on-error -file-line-error -Werror -outdir="{{.OUTDIR}}" picker.tex
+      - '! grep -Eq "undefined|There were undefined references|Reference .*undefined" "{{.OUTDIR}}/kompetenzkatalog.log"'
+
+  open-cards:
+    desc: Build and open the profile PDF on macOS
+    deps: [gen-cards]
+    cmds:
+      - open "{{.CARD_FILE}}"
+
+  open-picker:
+    desc: Build and open the competency catalog picker
+    deps: [gen-picker]
+    cmds:
+      - open "{{.PICKER_FILE}}"

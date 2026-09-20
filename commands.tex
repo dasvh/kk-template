@@ -1,0 +1,223 @@
+% Use TeX-distributed symbols so the template does not depend on local system fonts.
+\newcommand{\checkboxEmpty}{$\square$\ }
+\newcommand{\checkboxChecked}{$\boxtimes$\ }
+
+\newcommand{\checkbox}[2]{%
+	\ifnum#1=1
+		\checkboxChecked%
+	\else
+		\checkboxEmpty%
+	\fi
+	#2%
+}
+
+% Extract "A3" from "A3.1".
+\makeatletter
+\def\getRootID#1{\@@getRootID#1.\@nil}
+\def\@@getRootID#1.#2\@nil{#1}
+\makeatother
+
+% Store the catalog field and action text for use by cards and the profile.
+\newcommand{\templateCard}[3]{%
+	\edef\IDstr{#1}%
+	\edef\RootIDstr{\getRootID{#1}}%
+	\expandafter\def\csname K@\IDstr\endcsname{#3}%
+	\expandafter\def\csname K@\RootIDstr\endcsname{#2}%
+}
+
+\newif\ifcardsCollectOnly
+\cardsCollectOnlyfalse
+
+\def\currentCardGroup{}
+
+\def\cardGroupText#1 (#2)\cardGroupEnd{#1}
+
+\newcommand{\cardGroupHeading}{%
+	\ifx\currentCardGroup\RootIDstr
+	\else
+		\edef\cardGroupFullTitle{\csname K@\RootIDstr\endcsname}%
+		\edef\cardGroupCleanTitle{%
+			\expandafter\cardGroupText\cardGroupFullTitle\cardGroupEnd
+		}%
+		\edef\cardGroupTitle{\RootIDstr: \cardGroupCleanTitle}%
+		\subsection[\protect\numberline{\RootIDstr:}\cardGroupCleanTitle]{\cardGroupTitle}%
+		\edef\currentCardGroup{\RootIDstr}%
+	\fi
+}
+
+\newcommand{\createCard}[8]{%
+	\edef\IDstr{#1}%
+	\edef\RootIDstr{\getRootID{#1}}%
+	\ifnum\numexpr#5+#6+#7\relax=1
+	\else
+		\PackageError{kk-template}{Exactly one Kompetenzfeld must be selected}{%
+			Set exactly one of Fachkompetenz, Methodenkompetenz, or Sozialkompetenz to 1.}%
+	\fi
+	% Store work results for later reuse in the qualification profile.
+	\expandafter\def\csname AR@\IDstr\endcsname{#2}%
+	\ifcardsCollectOnly
+	\else
+		\cardGroupHeading
+		\newCard
+		{\IDstr}
+		{\csname K@\RootIDstr\endcsname}
+		{\csname K@\IDstr\endcsname}
+		{#2}{#3}
+		{#4}{#5}{#6}{#7}
+		{#8}
+	\fi
+}
+
+\newcommand{\newCard}[1]{%
+	\ifcardsLandscapeMode
+		\thispagestyle{empty}%
+	\else
+		\thispagestyle{plain}%
+	\fi
+	\phantomsection
+	\label{card:#1}
+	\newCardTable
+}
+
+\newcommand{\competenceRow}[3]{%
+	\parbox{\dimexpr\linewidth-8pt\relax}{%
+		\begin{tabularx}{\linewidth}{@{}>{\centering\arraybackslash}X
+			                >{\centering\arraybackslash}X
+			                >{\centering\arraybackslash}X@{}}
+		                {\centering\footnotesize{Fachkompetenz}} &
+		                {\centering\footnotesize{Methodenkompetenz}}  &
+		                {\centering\footnotesize{Sozialkompetenz}}                                    \\
+		                \checkbox{#1}                                 & \checkbox{#2} & \checkbox{#3}
+		\end{tabularx}
+	}%
+}
+
+\newcommand{\cardFieldHeight}{\ifcardsLandscapeMode 2.2cm\else 1.2cm\fi}
+\newcommand{\cardMainHeight}{\ifcardsLandscapeMode 7.4cm\else 2.8cm\fi}
+\newcommand{\cardMetaHeight}{\ifcardsLandscapeMode 1.8cm\else 1.0cm\fi}
+\newcommand{\cardCourseHeight}{\ifcardsLandscapeMode 1.0cm\else 0.8cm\fi}
+
+\newcommand{\cardTextCell}[2]{%
+	\begin{minipage}[t][#1][t]{\hsize}\vspace{0pt}\small #2\end{minipage}%
+}
+
+\newif\ifcardsLandscapeMode
+\cardsLandscapeModefalse
+
+\newcommand{\pageFooter}{%
+	\begin{tikzpicture}[remember picture, overlay]
+		\node[anchor=south west,inner sep=0pt] at
+		([xshift=1.5cm,yshift=0.8cm]current page.south west) {\footnotesize\Author};
+		\node[anchor=south east,inner sep=0pt] at
+		([xshift=\dimexpr\pdfpagewidth-1.5cm\relax,yshift=0.8cm]current page.south west)
+		{\footnotesize Seite \thepage};
+	\end{tikzpicture}%
+}
+
+\newcommand{\cardTableWidth}{%
+	\ifcardsLandscapeMode
+		\dimexpr\pdfpagewidth-3cm\relax
+	\else
+		\textwidth
+	\fi
+}
+
+\newcommand{\cardCellWidth}{%
+	\dimexpr(\cardTableWidth-4\tabcolsep-2\arrayrulewidth-5.1pt)/2\relax
+}
+
+\newcommand{\cardSpanWidth}{%
+	\dimexpr\cardTableWidth-2\tabcolsep-2\arrayrulewidth-5.1pt\relax
+}
+
+\renewcommand{\cardTextCell}[2]{%
+	\begin{minipage}[t][#1][t]{\dimexpr\linewidth-5pt\relax}\vspace{0pt}\small #2\end{minipage}%
+}
+
+% Arguments: field, action, work result, quality, context, technical, method,
+% social competence flags, and supporting school subject.
+\newcommand{\newCardTable}[9]{%
+	\noindent
+	\renewcommand{\arraystretch}{1.35}
+	\begin{tabular}{|>{\raggedright\arraybackslash}p{\cardCellWidth}|>{\raggedright\arraybackslash}p{\cardCellWidth}|}
+		\hline
+		\textbf{Handlungsfeld / Fachbereich} & \textbf{Handlung}                                          \\
+		\cardTextCell{\cardFieldHeight}{#1}  & \cardTextCell{\cardFieldHeight}{#2}                        \\
+		\hline
+		\textbf{Arbeitsergebnisse}           & \textbf{Qualität}                                          \\
+		\cardTextCell{\cardMainHeight}{#3}   & \cardTextCell{\cardMainHeight}{#4}                         \\
+		\hline
+		\textbf{Umfeld}                      & \textbf{Kompetenzfeld}                                     \\
+		\cardTextCell{\cardMetaHeight}{#5}   & \cardTextCell{\cardMetaHeight}{\competenceRow{#6}{#7}{#8}} \\
+		\hline
+		\multicolumn{2}{|p{\cardSpanWidth}|}{\textbf{Unterrichtsfach / Grundlagenwissen}}                 \\
+		\multicolumn{2}{|p{\cardSpanWidth}|}{\cardTextCell{\cardCourseHeight}{#9}}                        \\
+		\hline
+	\end{tabular}
+	\ifcardsLandscapeMode
+		\pageFooter%
+	\fi
+	\newpage
+}
+
+% Qualification-profile helpers.
+\newcommand{\qualityProfileHandlungsfeldText}[1]{%
+	\edef\RootIDstr{#1}%
+	\ifcsname K@\RootIDstr\endcsname
+		\csname K@\RootIDstr\endcsname%
+	\else
+		#1%
+	\fi
+}
+
+\newif\ifqualityProfileShowRefs
+\qualityProfileShowRefstrue
+
+\newcommand{\qualityProfileRef}[1]{%
+	\ifqualityProfileShowRefs
+	{\footnotesize\ (%
+		\ifcsname r@card:#1\endcsname
+			\hyperref[card:#1]{#1}%
+		\else
+			#1%
+		\fi
+		)}%
+	\fi
+}
+
+\newcommand{\qualityProfileArbeitsergebnis}[1]{%
+	\edef\IDstr{#1}%
+	\item
+	\ifcsname AR@\IDstr\endcsname
+		\ifcsname r@card:\IDstr\endcsname
+			\hyperref[card:\IDstr]{\csname AR@\IDstr\endcsname}%
+		\else
+			\csname AR@\IDstr\endcsname%
+		\fi
+		\qualityProfileRef{\IDstr}%
+	\else
+		\textit{TODO: Arbeitsergebnis für \IDstr}%
+	\fi
+}
+
+\newcommand{\qualityProfileBullet}[2][]{%
+	\item #2%
+	\if\relax\detokenize{#1}\relax
+	\else
+		{\footnotesize\ (#1)}%
+	\fi
+}
+
+\newcommand{\qpField}[1]{%
+	\begin{minipage}[t]{\linewidth}\vspace{0pt}\raggedright
+		\textbf{\qualityProfileHandlungsfeldText{#1}}%
+	\end{minipage}%
+}
+
+\newcommand{\qpList}[1]{%
+	\begin{minipage}[t]{\linewidth}\vspace{0pt}\raggedright
+		\begin{itemize}[leftmargin=*, label=\textbullet, itemsep=0.6ex, topsep=0pt, partopsep=0pt, parsep=0pt]
+			#1%
+		\end{itemize}
+	\end{minipage}%
+}

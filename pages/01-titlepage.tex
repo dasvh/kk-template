@@ -1,0 +1,31 @@
+\begin{titlepage}
+  \pagestyle{empty}
+  \centering
+
+  \definecolor{accentColor}{HTML}{28566F}
+
+  \begin{tikzpicture}[remember picture, overlay]
+    \fill[accentColor]
+      (current page.north west) rectangle ([yshift=-20mm]current page.north east);
+    \fill[accentColor]
+      (current page.south west) rectangle ([yshift=20mm]current page.south east);
+  \end{tikzpicture}
+
+  \vspace*{0.8cm}
+
+  {\LARGE \textbf{\Title}}\\[0.5cm]
+  {\Large \Subject}
+
+  \vfill
+
+  \input{\coverFile}
+
+  \vfill
+
+  \textbf{\Author}       \\
+  \textbf{\Organisation} \\
+  \textbf{\Class}        \\
+  \textbf{\SubmitDate}   \\
+
+  \vspace*{0.8cm}
+\end{titlepage}

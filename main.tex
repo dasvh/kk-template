@@ -1,0 +1,70 @@
+\documentclass{article}
+\input{packages.tex}
+\input{commands.tex}
+
+\newcommand{\metadataFile}{metadata.example.tex}
+\IfFileExists{local/metadata.tex}{\renewcommand{\metadataFile}{local/metadata.tex}}{}
+\input{\metadataFile}
+\input{templates.tex}
+
+\newcommand{\cardsFile}{pages/03-cards.example.tex}
+\IfFileExists{local/cards.tex}{\renewcommand{\cardsFile}{local/cards.tex}}{}
+\newcommand{\profileFile}{pages/02-quality-profile.example.tex}
+\IfFileExists{local/quality-profile.tex}{\renewcommand{\profileFile}{local/quality-profile.tex}}{}
+\newcommand{\coverFile}{assets/example-cover.tex}
+\IfFileExists{local/assets/cover.tex}{\renewcommand{\coverFile}{local/assets/cover.tex}}{}
+
+\geometry{a4paper, portrait, margin=1.5cm}
+\hypersetup{
+  pdftitle={\Title},
+  pdfauthor={\Author},
+  pdfsubject={Kompetenzkarten und Qualifikationsprofil},
+  pdfcreator={XeLaTeX}
+}
+
+\begin{document}
+\setcounter{secnumdepth}{0}
+\setcounter{tocdepth}{2}
+
+\hypersetup{pageanchor=false}
+\input{pages/01-titlepage}
+\hypersetup{pageanchor=true}
+\pagestyle{plain}
+\newpage
+
+\tableofcontents
+\newpage
+
+% Collect card results before the profile links to them.
+\cardsCollectOnlytrue
+\input{\cardsFile}
+\cardsCollectOnlyfalse
+
+\input{\profileFile}
+\newpage
+
+\clearpage
+\setlength{\paperwidth}{297mm}
+\setlength{\paperheight}{210mm}
+\pdfpagewidth=\paperwidth
+\pdfpageheight=\paperheight
+\newgeometry{
+  left=1.5cm, right=1.5cm,
+  top=1.5cm, bottom=1.5cm,
+  includefoot, footskip=1.0cm
+}
+\cardsLandscapeModetrue
+\section{Kompetenzkarten}
+\setlength{\textwidth}{\dimexpr\pdfpagewidth-3.1cm\relax}
+\setlength{\linewidth}{\textwidth}
+\setlength{\columnwidth}{\textwidth}
+\setlength{\hsize}{\textwidth}
+\input{\cardsFile}
+\cardsLandscapeModefalse
+\restoregeometry
+\setlength{\paperwidth}{210mm}
+\setlength{\paperheight}{297mm}
+\pdfpagewidth=\paperwidth
+\pdfpageheight=\paperheight
+
+\end{document}

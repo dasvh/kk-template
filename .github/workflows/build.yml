@@ -1,0 +1,28 @@
+name: Build documents
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  latex:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install TeX dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install --no-install-recommends -y \
+            latexmk texlive-fonts-extra texlive-latex-extra texlive-xetex
+      - name: Build profile
+        run: |
+          mkdir -p build
+          latexmk -pdfxe -jobname=kompetenzprofil -interaction=nonstopmode -halt-on-error -file-line-error -Werror -outdir=build main.tex
+      - name: Build picker
+        run: |
+          latexmk -pdfxe -jobname=kompetenzkatalog -interaction=nonstopmode -halt-on-error -file-line-error -Werror -outdir=build picker.tex
+      - name: Check references
+        run: |
+          ! grep -Eq "undefined|There were undefined references|Reference .*undefined" build/kompetenzprofil.log build/kompetenzkatalog.log
+      - name: Check outputs
+        run: test -s build/kompetenzprofil.pdf && test -s build/kompetenzkatalog.pdf

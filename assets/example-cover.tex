@@ -1,0 +1,25 @@
+% Original, dependency-free example cover drawn with TikZ.
+\begin{tikzpicture}[x=1cm,y=1cm]
+\definecolor{coverBlue}{HTML}{28566F}
+\definecolor{coverGold}{HTML}{E6B85C}
+\definecolor{coverLight}{HTML}{EAF1F3}
+
+\fill[coverLight, rounded corners=5pt] (-6.1,-4.1) rectangle (6.1,4.1);
+\fill[coverBlue, rounded corners=5pt] (-5.2,-2.9) rectangle (5.2,2.9);
+\fill[coverGold] (-4.2,1.9) rectangle (-1.0,2.35);
+\fill[white, opacity=.92] (-4.2,-1.85) rectangle (3.9,-1.35);
+\fill[white, opacity=.72] (-4.2,-2.55) rectangle (2.2,-2.15);
+
+\draw[white, line width=1.2pt, rounded corners=2pt]
+  (-3.8,-0.7) rectangle (-0.8,1.2);
+\draw[coverGold, line width=1.2pt, rounded corners=2pt]
+  (-0.1,-0.7) rectangle (2.9,1.2);
+\draw[white, line width=1.2pt, rounded corners=2pt]
+  (3.6,-0.7) rectangle (4.3,1.2);
+\draw[coverGold, line width=1.2pt]
+  (-2.9,0.3) -- (-1.7,0.3) -- (-1.7,-0.1);
+\draw[coverGold, line width=1.2pt]
+  (0.8,0.3) -- (2.0,0.3) -- (2.0,-0.1);
+\draw[white, line width=1.2pt]
+  (3.0,0.3) -- (3.6,0.3);
+\end{tikzpicture}

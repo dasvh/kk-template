@@ -1,0 +1,69 @@
+\documentclass{article}
+
+\usepackage[ngerman]{babel}
+\usepackage[a4paper,margin=18mm]{geometry}
+\usepackage[sfdefault]{FiraSans}
+\usepackage{tabularx,ragged2e}
+
+\setlength{\tabcolsep}{8pt}
+\renewcommand{\arraystretch}{1.5}
+\newcommand{\groupgap}{1.5\baselineskip}
+
+\newcolumntype{L}[1]{>{\RaggedRight\arraybackslash}p{#1}}
+\newcolumntype{Y}{>{\RaggedRight\arraybackslash}X}
+
+\makeatletter
+\def\getRootID#1{\@@getRootID#1.\@nil}
+\def\@@getRootID#1.#2\@nil{#1}
+
+% Add text to a catalog bucket while preserving catalog order.
+\newcommand{\gp@addto}[2]{%
+  \expandafter\ifx\csname#1\endcsname\relax
+    \expandafter\gdef\csname#1\endcsname{#2}%
+  \else
+    \expandafter\g@addto@macro\csname#1\endcsname{#2}%
+  \fi
+}
+
+% F@<root> stores the field, L@<root> stores ordered IDs, M@<ID> stores actions.
+\newcommand{\templateCard}[3]{%
+  \edef\root{\getRootID{#1}}%
+  \expandafter\gdef\csname F@\root\endcsname{#2}%
+  \expandafter\gdef\csname M@#1\endcsname{#3}%
+  \gp@addto{L@\root}{\do{#1}}%
+}
+\makeatother
+
+\newcommand{\Row}[1]{%
+  \texttt{#1} & \csname M@#1\endcsname\\
+}
+
+\begin{document}
+
+\input{templates.tex}
+
+% The catalog is grouped by the official A1-A3 and B4-B15 identifiers.
+\makeatletter
+\def\gp@order{A1,A2,A3,B4,B5,B6,B7,B8,B9,B10,B11,B12,B13,B14,B15}
+
+\@for\g:=\gp@order\do{%
+  \expandafter\ifx\csname L@\g\endcsname\relax
+  \else
+    {\let\do\Row
+      \begin{tabularx}{\dimexpr\textwidth-15pt\relax}{@{}L{0.14\textwidth}@{}Y@{}}
+        \hline
+        \textbf{\g} & \parbox[t]{\dimexpr0.86\textwidth-15pt\relax}{\raggedright\itshape\csname F@\g\endcsname} \\
+        \hline
+        \textbf{ID} & \textbf{Handlung} \\
+        \hline
+        \csname L@\g\endcsname
+        \hline
+      \end{tabularx}
+    }%
+
+    \vspace{\groupgap}
+  \fi
+}
+\makeatother
+
+\end{document}
